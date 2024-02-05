@@ -116,23 +116,23 @@ for (let i = 0; i < filterBtn.length; i++) {
 
 
 // contact form variables
-const form = document.querySelector("[data-form]");
-const formInputs = document.querySelectorAll("[data-form-input]");
-const formBtn = document.querySelector("[data-form-btn]");
+// const form = document.querySelector("[data-form]");
+// const formInputs = document.querySelectorAll("[data-form-input]");
+// const formBtn = document.querySelector("[data-form-btn]");
 
-// add event to all form input field
-for (let i = 0; i < formInputs.length; i++) {
-  formInputs[i].addEventListener("input", function () {
+// // add event to all form input field
+// for (let i = 0; i < formInputs.length; i++) {
+//   formInputs[i].addEventListener("input", function () {
 
-    // check form validation
-    if (form.checkValidity()) {
-      formBtn.removeAttribute("disabled");
-    } else {
-      formBtn.setAttribute("disabled", "");
-    }
+//     // check form validation
+//     if (form.checkValidity()) {
+//       formBtn.removeAttribute("disabled");
+//     } else {
+//       formBtn.setAttribute("disabled", "");
+//     }
 
-  });
-}
+//   });
+// }
 
 
 
@@ -157,3 +157,47 @@ for (let i = 0; i < navigationLinks.length; i++) {
 
   });
 }
+
+const form = document.querySelector('[data-form]');
+const fullNameInput = document.querySelector('[name="fullname"]');
+const emailInput = document.querySelector('[name="email"]');
+const messageInput = document.querySelector('[name="message"]');
+const submitButton = document.querySelector('[data-form-btn]');
+
+form.addEventListener('submit', async (event) => {
+  event.preventDefault();
+
+  const fullName = fullNameInput.value;
+  const email = emailInput.value;
+  const message = messageInput.value;
+
+  // Check if Firebase is initialized
+  if (firebase.apps.length === 0) {
+    console.error('Firebase is not initialized.');
+    return;
+  }
+
+  try {
+    // Get a reference to your Firebase database
+    const database = firebase.database();
+    // Or use Firestore
+    // const firestore = firebase.firestore();
+
+    // Add the form data to the database
+    await database.ref('formSubmissions').push({
+      fullName,
+      email,
+      message,
+      timestamp: firebase.database.ServerValue.TIMESTAMP,
+    });
+
+    // Clear the form inputs
+    fullNameInput.value = '';
+    emailInput.value = '';
+    messageInput.value = '';
+
+    console.log('Form submission successful');
+  } catch (error) {
+    console.error('Error submitting form:', error);
+  }
+});
